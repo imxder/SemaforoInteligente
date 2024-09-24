@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Semáforos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0; /* Remove a margem padrão do body */
+            height: 100vh; /* Altura total da tela */
+            background-color: #f0f0f0; /* Cor de fundo suave */
+            display: flex; /* Centraliza o conteúdo na tela */
+            flex-direction: column; /* Organiza o conteúdo em coluna */
+            justify-content: center; /* Alinha verticalmente ao centro */
+        }
+
+        h1 {
+            margin-bottom: 20px; /* Espaço abaixo do título */
+            color: #333; /* Cor do texto do título */
+        }
+
+        .cruzamento {
+            position: relative; /* Para o posicionamento absoluto dos semáforos */
+            height: 80vh; /* Altura total do cruzamento */
+            width: 80vw; /* Largura total do cruzamento */
+            margin: auto; /* Centraliza o cruzamento horizontalmente */
+            background-color: #fff; /* Fundo branco para o cruzamento */
+            border-radius: 10px; /* Bordas arredondadas */
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* Sombra para profundidade */
+        }
+
+        .semaforo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: absolute; /* Para permitir o posicionamento em relação à tela */
+            z-index: 1; /* Eleva o semáforo acima de outros elementos */
+        }
+
+        .semaforo img {
+            width: 80px;
+            height: 80px;
+            transition: transform 0.3s; /* Transição suave ao mudar a imagem */
+        }
+
+        /* Posições dos semáforos */
+        #norte {
+            top: 10%; /* Distância do topo */
+            left: 50%; /* Centraliza horizontalmente */
+            transform: translateX(-50%); /* Ajusta a centralização */
+        }
+
+        #sul {
+            bottom: 10%; /* Distância da parte inferior */
+            left: 50%; /* Centraliza horizontalmente */
+            transform: translateX(-50%); /* Ajusta a centralização */
+        }
+
+        #leste {
+            top: 50%; /* Centraliza verticalmente */
+            right: 10%; /* Distância da borda direita */
+            transform: translateY(-50%); /* Ajusta a centralização */
+        }
+
+        #oeste {
+            top: 50%; /* Centraliza verticalmente */
+            left: 10%; /* Distância da borda esquerda */
+            transform: translateY(-50%); /* Ajusta a centralização */
+        }
+
+        h2 {
+            margin: 10px 0 5px 0;
+            color: #666; /* Cor do texto dos semáforos */
+        }
+
+        p {
+            margin: 0; /* Remove margens dos parágrafos */
+            color: #888; /* Cor do texto da contagem de veículos */
+            font-weight: bold; /* Destaca o texto */
+        }
+    </style>
+</head>
+<body>
+    <h1>Sistema de Semáforos em Tempo Real</h1>
+
+    <div class="cruzamento">
+        <!-- Semáforo Norte -->
+        <div id="norte" class="semaforo">
+            <h2>Norte</h2>
+            <img id="img-norte" src="static/images/semaforo_vermelho.png" alt="Semáforo Norte">
+            <p id="veiculos-norte">Veículos esperando: 0</p>
+        </div>
+
+        <!-- Semáforo Oeste -->
+        <div id="oeste" class="semaforo">
+            <h2>Oeste</h2>
+            <img id="img-oeste" src="static/images/semaforo_vermelho.png" alt="Semáforo Oeste">
+            <p id="veiculos-oeste">Veículos esperando: 0</p>
+        </div>
+
+        <!-- Semáforo Leste -->
+        <div id="leste" class="semaforo">
+            <h2>Leste</h2>
+            <img id="img-leste" src="static/images/semaforo_vermelho.png" alt="Semáforo Leste">
+            <p id="veiculos-leste">Veículos esperando: 0</p>
+        </div>
+
+        <!-- Semáforo Sul -->
+        <div id="sul" class="semaforo">
+            <h2>Sul</h2>
+            <img id="img-sul" src="static/images/semaforo_vermelho.png" alt="Semáforo Sul">
+            <p id="veiculos-sul">Veículos esperando: 0</p>
+        </div>
+    </div>
+
+    <script>
+        function atualizarSemaforos() {
+            fetch('/status')
+            .then(response => response.json())
+            .then(data => {
+                // Atualizar o estado de cada semáforo
+                for (const direcao in data) {
+                    const semaforo = data[direcao];
+                    const imgElement = document.getElementById(`img-${direcao.toLowerCase()}`);
+                    const veiculosElement = document.getElementById(`veiculos-${direcao.toLowerCase()}`);
+
+                    // Mudar a imagem do semáforo conforme o estado (verde ou vermelho)
+                    if (semaforo.estado === "verde") {
+                        imgElement.src = "static/images/semaforo_verde.png";
+                    } else {
+                        imgElement.src = "static/images/semaforo_vermelho.png";
+                    }
+
+                    // Atualizar o número de veículos esperando
+                    veiculosElement.textContent = `Veículos esperando: ${semaforo.veiculos}`;
+                }
+            });
+        }
+
+        // Atualiza a cada 2 segundos
+        setInterval(atualizarSemaforos, 2000);
+    </script>
+</body>
+</html>
